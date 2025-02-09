@@ -171,3 +171,4 @@ cython_debug/
 .pypirc
 
 # to ensure credentials are not pushed to the repository
+*.json

@@ -3,15 +3,26 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
 from datetime import datetime
+import os
+from google.oauth2.service_account import Credentials
+import json
 
-#%%
+
+
 # Google Sheets Setup
 SHEET_URL = "https://docs.google.com/spreadsheets/d/1oVdiLIFMQpJKKTqvu3k955inWT-91KXhaR5p6tqkY4E/edit?usp=sharing"  # Replace with your actual Google Sheet URL
-CREDENTIALS_FILE = "weekly-chore-tracker-51adb7b626aa.json"  # Replace with your JSON file path
+CREDENTIALS_FILE = os.getenv("GOOGLE_CREDS")  # Set the environment variable in your deployment platform
+
+
+if CREDENTIALS_FILE:
+    credentials_dict = json.loads(CREDENTIALS_FILE)  # Convert JSON string to dictionary
+    creds = Credentials.from_service_account_info(credentials_dict)
+else:
+    raise Exception("GOOGLE_CREDENTIALS environment variable is not set")
 
 # Authenticate and connect to Google Sheets
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, scope)
+#creds = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, scope)
 client = gspread.authorize(creds)
 sheet = client.open_by_url(SHEET_URL).sheet1  # Open the first sheet
 
@@ -46,3 +57,12 @@ with col2:
     if st.button("❌ Subtract $3"):
         update_balance(-3)
         st.rerun()
+
+
+'''
+Having issues with deployment in Azure
+site is ddeploying but not loading. . .
+issue removing credentials.json file from commit
+
+
+'''
